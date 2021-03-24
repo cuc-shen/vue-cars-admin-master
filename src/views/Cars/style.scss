@@ -1,0 +1,32 @@
+.progress-bar-wrap{
+    padding-left: 50px;
+    margin-top: 10px;
+    position: relative;
+    .label-text{
+        position: absolute;
+        left: 0;
+    }
+}
+.progress-bar{
+    height: 10px;
+    width: 100%;
+    border-radius: 50px;
+    background-color: #ccc;
+    margin-top: 16px;
+    span{
+        position: relative;
+        display: block;
+        height: 100%;
+        border-radius: 50px;
+        background-color: #409eff;    
+    } 
+    label{
+        position: absolute;
+        right: 0;
+        bottom: 10%;
+    }  
+    
+}
+.cars-attr-list{
+    margin-bottom: 15px;
+}
