@@ -41,7 +41,16 @@
             </el-row>
             
         </div>
-        <TableData :config="table_config"/>
+        <TableData :config="table_config">
+            <!-- 禁启用 -->
+            <template v-slot:status="slotData">
+                <el-switch v-model="slotData.data.status" active-value="2" inactive-value="1" active-color="#13ce66" inactive-color="#ff4949"> </el-switch>
+            </template>
+            <!-- 查看地图 -->
+            <template v-slot:lnglat="slotData">
+                <el-button type="success" size="mini" @click="showMap(slotData.data)">查看地图</el-button>
+            </template>
+        </TableData>
         <!-- 表格数据 -->
         <el-table :data="tableData" border style="width: 100%" v-loading="table_loading">
             <el-table-column type="selection" width="35"></el-table-column>
@@ -105,14 +114,38 @@ export default {
             table_config:{
                 thead:[
                     {label:"停车场名称",prop:"parkingName"},
-                    {label:"类型",prop:"type"},
-                    {label:"区域",prop:"address"},
+                    {
+                        label:"类型",
+                        prop:"type",
+                        type:"function",
+                        callback:(row,prop)=>{
+                            const data = this.parking_type_json[row[prop]];
+                            if(data) {
+                                return data.label
+                            }
+                            return data[0].label
+                        }
+                        },
+                    {label:"区域",prop:"address",type:"function",callback:(row,prop)=>{
+                        let address=row[prop]
+                        let addressInfo="";
+                        if(address){
+                            let split=address.split(",");
+                            addressInfo+=split[0];
+                            //街道
+                            if(split[1]){
+                                addressInfo+=`<br/>${split[1]}`
+                            }
+                            return addressInfo;
+                        }
+                    }},
                     {label:"可停放车辆",prop:"carsNumber"},
-                    {label:"禁启用",prop:"disabled"},
-                    {label:"查看位置",prop:"lnglat"},
+                    {label:"禁启用",prop:"disabled",type:"slot",slotName:"status"},
+                    {label:"查看位置",prop:"lnglat",type:"slot",slotName:"lnglat"},
                     
                 ],
-                checkbox:true
+                checkbox:true,
+                url:"/parking/list/"
             },
             // 页码
             total: 0,
@@ -134,6 +167,8 @@ export default {
             parking_status: this.$store.state.config.parking_status,
             // 停车场类型
             parking_type: this.$store.state.config.parking_type,
+            // 停车场类型JSON
+            parking_type_json: this.$store.state.config.parking_type_json,
             // 数据列表
             tableData: [],
             // 地图显示 
@@ -179,7 +214,7 @@ export default {
                         type: 'success',
                         message: response.message
                     });
-                    this.getParkingList();
+                    // this.getParkingList();
                 })
             }).catch(() => {});
         },
@@ -192,16 +227,16 @@ export default {
         /** 页码 */
         handleSizeChange(val){
             this.pageSize = val;
-            this.getParkingList();
+            // this.getParkingList();
         },
         handleCurrentChange(val){
             this.pageNumber = val;
-            this.getParkingList();
+            // this.getParkingList();
         }
     },
     // DOM元素渲染之前（生命周期）
     beforeMount(){
-        this.getParkingList();
+        // this.getParkingList();
     },
     // DOM元素渲染完成（生命周期）
     mounted(){

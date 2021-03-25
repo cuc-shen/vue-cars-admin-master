@@ -14,11 +14,11 @@ export function GetCity(data = {}){
 /**
  * 获取table列表
  */
-export function GetTableData(params = {}){
+export function GetTableData(data = {}){
     return service.request({
         method: "post",
-        url: requestUrl[params.url],
-        data: params.data
+        url: data.url,
+        data: data.data
     })
 }
 
